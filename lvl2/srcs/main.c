@@ -6,7 +6,7 @@
 /*   By: jonascim <jonascim@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/03 19:37:18 by jonascim          #+#    #+#             */
-/*   Updated: 2023/06/04 16:12:24 by jonascim         ###   ########.fr       */
+/*   Updated: 2023/06/04 16:34:26 by jonascim         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,10 +38,11 @@ char	**parse_file(char **argv)
 	return (file);
 }
 
-int	calories_count(char **file)
+int	*calories_count(char **file)
 {
+	int	*elfs = malloc(sizeof(int *));
+	int	index = 0;
 	int	partial = 0;
-	int	highest = 0;
 
 	for (int i = 0; i < 2244; i++)
 	{
@@ -49,24 +50,49 @@ int	calories_count(char **file)
 			partial += ft_atoi(file[i]);
 		else
 		{
-			if (partial > highest)
-				highest = partial;
+			elfs[index] = partial;
+			elfs = realloc(elfs, (index + 1) * sizeof(char *));
+			index++;
 			partial = 0;
 		}
 	}
-	return (highest);
+	elfs[index] = -1;
+	return (elfs);
+}
+
+int	*sort(int *elfs)
+{
+	int	aux = 0;
+	int	index = 0;
+
+	while (elfs[index + 1] != -1)
+	{
+		if (elfs[index] < elfs[index + 1])
+		{
+			aux = elfs[index + 1];
+			elfs[index + 1] = elfs[index];
+			elfs[index] = aux;
+			index = 0;
+		}
+		else
+			index++;
+	}
+	return (elfs);
 }
 
 int	main(int argc, char **argv)
 {
 	char	**file;
-	int		calc;
+	int		*elfs;
 
 	if (argc == 2)
 	{
 		file = parse_file(argv);
-		calc = calories_count(file);
-		printf("%d\n", calc);
+		elfs = calories_count(file);
+		elfs = sort(elfs);
+		// for (int i = 0; elfs[i] != -1; i++)
+		// 	printf("%d\n", elfs[i]);
+		printf("%d\n", elfs[0] + elfs[1] + elfs[2]);
 		for (int i = 0; i < 2244; i++)
 			free(file[i]);
 		free(file);
